@@ -1,0 +1,375 @@
+options{
+	STATIC=false;
+	MULTI=true;
+	//NODE_DEFAULT_VOID=true;
+	VISITOR=true;
+}
+
+PARSER_BEGIN(Parser)
+
+import java.util.*;
+import java.io.*;
+
+class Parser {
+  public static void main(String args[])
+  {
+	try{
+		FileReader source;
+	
+    //System.out.println("Reading from standard input...");
+    Parser t;
+
+	if(args.length == 2){
+		switch(args[1]){
+		case "-A":
+		     System.out.println("Checking syntax in the advanced method...");
+		     source = new FileReader(new File(args[0]));
+		     int numOfBlocks = DivideIntoBlocks.Dividing(source);
+		     //DivideIntoBlocks.Generate();
+		     for(int i=1;i<numOfBlocks;i++){
+		        System.out.println("Checking block" + i + "...");
+			t = new Parser(DivideIntoBlocks.blockRef(i));
+			t.block();
+		     }
+		     System.out.println("Processed successfully.");
+		     break;
+		case "-D":
+		     System.out.println("AST dump start...");
+		     source = new FileReader(new File(args[0]));
+		     t = new Parser(source);
+      		     SimpleNode n = t.body();
+      		     n.dump(" ");
+		     System.exit(0);
+		default:
+		     System.out.println("Error : No such option \"" + args[1] + "\"");
+		     System.exit(0);
+		}
+	}
+
+	System.out.println("Parsing in the general method...");
+	source = new FileReader(new File(args[0]));
+	t = new Parser(source);
+      ParserVisitor visitor = new ParserVisitorImplements();
+      t.body().jjtAccept(visitor,null);
+
+		IRGenerator.IRGenerate();
+		
+		AssemblyGenerator.Generate();
+
+		Runtime r = Runtime.getRuntime();
+		Process p = r.exec("as Assembly.s -o Object.o");
+		p.waitFor();
+		p = r.exec("gcc Object.o -o a.out");
+		p.waitFor();
+
+    }catch (Exception e){
+      System.out.println("Oops.");
+      //System.out.println(e.getMessage());
+      e.printStackTrace();
+    }
+  }
+}
+
+PARSER_END(Parser)
+
+SKIP: { <[" ","\t","\r","\n"]> }
+
+TOKEN:{
+	 <VOID:"void">
+	|<INT:"int">
+	|<DOUBLE:"double">
+	|<STATIC:"static">
+	|<CONST:"const">
+	|<IF:"if">
+	|<ELSE:"else">
+	|<FOR:"for">
+	|<RETURN:"return">
+	|<PRINTF:"printf">
+}
+
+TOKEN: {
+    <IDENTIFIER: ["a"-"z", "A"-"Z", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9"])*>
+}
+
+TOKEN: {
+       <INTEGER: ["1"-"9"] (["0"-"9"])* ("U")? ("L")?
+       	| "0" ["x", "X"] (["0"-"9", "a"-"f", "A"-"F"])+ ("U")? ("L")?
+		| "0" (["0"-"7"])* ("U")? ("L")?
+		>
+}
+
+MORE: { <"\""> : IN_STRING }
+<IN_STRING> MORE: {
+      <(~["\"", "\\", "\n", "\r"])+>
+    | <"\\" (["0"-"7"]){3}>
+    | <"\\" ~[]>
+}
+<IN_STRING> TOKEN: { <STRING: "\""> : DEFAULT }
+
+SimpleNode body() #body:
+{}
+{
+	defines() <EOF> {return jjtThis;}
+}
+
+void defines():
+{}
+{
+	(LOOKAHEAD(/*storage()*/ type_ref() <IDENTIFIER> "(") def_fun()
+	|LOOKAHEAD(3) def_vars()
+	/*|def_const()*/)*
+}
+
+void def_fun():
+{}
+{
+	/*storage()*/ type_ref() name() "(" params() ")" block()
+}
+
+void params():
+{}
+{
+	/*LOOKAHEAD(<VOID> ")")*/ <VOID>
+}
+
+void block():
+{}
+{
+	"{" def_var_list() stmts() "}"
+}
+
+void def_var_list() #def_var_list(>1):
+{}
+{
+	(def_vars())*
+}
+
+void def_vars() #def_vars:
+{}
+{
+	/*storage()*/ type() name() ["=" expr()]
+	       ("," name() ["=" expr()])* ";"
+}
+
+void def_const():
+{}
+{
+	<CONST> type() name() "=" expr() ";"
+}
+
+void type() #type:
+{}
+{
+	type_ref()
+}
+
+void type_ref():
+{}
+{
+	type_basic()
+}
+
+void type_basic():
+{
+	Token t = null;
+}
+{
+	 t=<INT> {jjtThis.jjtSetValue(t.image);}
+	|t=<DOUBLE> {jjtThis.jjtSetValue(t.image);}
+}
+
+void name() #name:
+{
+	Token t = null;
+}
+{
+	t=<IDENTIFIER> {jjtThis.jjtSetValue(t.image);}
+}
+
+void stmts():
+{}
+{
+	(stmt())*
+}
+
+void stmt() #stmt:
+{}
+{
+	(";"
+	//|LOOKAHEAD(2) labeled_stmt()
+	|expr() ";"
+	|block()
+	|if_stmt()
+	|for_stmt()
+	|return_stmt()
+	|printf_stmt()
+	)
+}	
+
+void if_stmt():
+{}
+{
+	<IF> "(" expr() ")" stmt() [LOOKAHEAD(1) <ELSE> stmt()]
+}
+
+void for_stmt():
+{}
+{
+	<FOR> "(" [expr()] ";" [expr()] ";" [expr()] ")" stmt()
+}
+
+void return_stmt():
+{}
+{
+	 LOOKAHEAD(2) <RETURN> ";"
+	|<RETURN> expr() ";"
+}
+
+void printf_stmt():
+{
+	Token str = null;
+}
+{
+	<PRINTF> "(" str=<STRING> ("," expr())* ")" ";" {jjtThis.jjtSetValue(str.image);}
+}
+
+void expr():
+{}
+{
+	 LOOKAHEAD(term() "=") term() "=" expr() {jjtThis.jjtSetValue("=");}
+	|expr10() {jjtThis.jjtSetValue("expr");}
+}
+
+void expr10() #expr10(>1):
+{}
+{
+	expr9() /*["?" expr() ":" expr10()]*/
+}
+
+void expr9() #expr9(>1):
+{}
+{
+	expr8() /*("||" expr8())**/
+}
+
+void expr8() #expr8(>1):
+{}
+{
+	expr7() /*("&&" expr7())**/
+}
+
+void expr7() #expr7(>1):
+{
+	List<String> tokens = new ArrayList<String>();
+}
+{
+	expr6() (">" expr6() {tokens.add(">");}
+		|"<" expr6() {tokens.add("<");}
+		|">=" expr6() {tokens.add(">=");}
+		|"<=" expr6() {tokens.add("<=");}
+		|"==" expr6() {tokens.add("==");}
+		|"!=" expr6() {tokens.add("!=");}
+		)* {jjtThis.jjtSetValue(tokens);}
+}
+
+void expr6() #expr6(>1):
+{}
+{
+	expr5() /*("|" expr5())**/
+}
+
+void expr5() #expr5(>1):
+{}
+{
+	expr4() /*("^" expr4())**/
+}
+
+void expr4() #expr4(>1):
+{}
+{
+	expr3() /*("&" expr3())**/
+}
+
+void expr3() #expr3(>1):
+{}
+{
+	expr2() /*(">>" expr2()
+		|"<<" expr2())**/
+}
+
+void expr2() #expr2(>1):
+{
+	List<String> tokens = new ArrayList<String>();
+}
+{
+	expr1()
+	("+" expr1() {tokens.add("+");}
+	|"-" expr1() {tokens.add("-");}
+	)* {jjtThis.jjtSetValue(tokens);}
+}
+
+void expr1() #expr1(>1):
+{
+	List<String> tokens = new ArrayList<String>();
+}
+{
+	term()
+	("*" term() {tokens.add("*");}
+	|"/" term() {tokens.add("/");}
+	//|"%" term()
+	)* {jjtThis.jjtSetValue(tokens);}
+}
+
+void term() #term:
+{}
+{
+	 LOOKAHEAD("(" type()) "(" type() ")" term() //{return "(" + ty + ")" + te};
+	|unary() //{return te;}
+}
+
+void unary():
+{}
+{
+	/* "++" unary()
+	|"--" unary()
+	|"+" term()
+	|"-" term()
+	|"!" term()
+	|"~" term()
+	|"*" term()
+	|"&" term()
+	|*/
+	postfix()
+	//sizeof is undefined
+}
+
+void postfix():
+{}
+{
+	primary()
+	/*("++"
+	|"--"
+	|"[" expr() "]"
+	)**/
+	//|"." name()
+	//|"->" name()
+	//|"(" args() ")")*
+}
+
+void primary():
+{
+	Token t;
+}
+{
+	 t=<INTEGER> {jjtThis.jjtSetValue(t.image);}
+	//|<CHARACTER>
+	//|<STRING>
+	|t=<IDENTIFIER> {jjtThis.jjtSetValue(t.image);}
+	//|"(" expr() ")"
+}
+
+/*void storage():
+{}
+{
+	[<STATIC>]
+}*/
