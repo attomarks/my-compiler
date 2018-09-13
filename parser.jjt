@@ -13,6 +13,7 @@ import java.io.*;
 class Parser {
   public static void main(String args[])
   {
+	int blockNum = 0;
 	try{
 		FileReader source;
 	
@@ -26,9 +27,9 @@ class Parser {
 		     source = new FileReader(new File(args[0]));
 		     int numOfBlocks = DivideIntoBlocks.Dividing(source);
 		     //DivideIntoBlocks.Generate();
-		     for(int i=1;i<numOfBlocks;i++){
-		        System.out.println("Checking block" + i + "...");
-			t = new Parser(DivideIntoBlocks.blockRef(i));
+		     for(blockNum = 1; blockNum < numOfBlocks; blockNum++){
+		        System.out.println("Checking block" + blockNum + "...");
+			t = new Parser(DivideIntoBlocks.blockRef(blockNum));
 			t.block();
 		     }
 		     System.out.println("Processed successfully.");
@@ -61,11 +62,19 @@ class Parser {
 		p.waitFor();
 		p = r.exec("gcc Object.o -o a.out");
 		p.waitFor();
-
-    }catch (Exception e){
+		
+    }catch (ParseException e){
       System.out.println("Oops.");
-      //System.out.println(e.getMessage());
       e.printStackTrace();
+      if(blockNum>0){
+         System.out.println("### Syntax error in block" + blockNum + " ###");
+	 DivideIntoBlocks.Generate(blockNum);
+	 System.out.println("#############################");
+      }
+    }catch (Exception e) {
+      System.out.println("Oops.");
+      e.printStackTrace();
+      //System.out.println(e.getMessage());
     }
   }
 }

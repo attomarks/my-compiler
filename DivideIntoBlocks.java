@@ -56,6 +56,10 @@ class DivideIntoBlocks{
 	    System.out.println("");
 	}
     }
+
+    static void Generate(int num){
+	System.out.println(blocks.get(num));
+    }
     
     static Reader blockRef(int index){
 	Reader reader = new StringReader(blocks.get(index));
