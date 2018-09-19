@@ -53,9 +53,9 @@ class Parser {
       ParserVisitor visitor = new ParserVisitorImplements();
       t.body().jjtAccept(visitor,null);
 
-		IRGenerator.IRGenerate();
+		//IRGenerator.IRGenerate();
 		
-		AssemblyGenerator.Generate();
+		//AssemblyGenerator.Generate();
 
 		Runtime r = Runtime.getRuntime();
 		Process p = r.exec("as Assembly.s -o Object.o");

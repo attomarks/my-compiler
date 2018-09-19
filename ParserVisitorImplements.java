@@ -14,20 +14,20 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	@Override
 	public Object visit(ASTbody node, Object data){
-	    System.out.println("visited ASTbody");
+	    //System.out.println("visited ASTbody");
 	    node.jjtGetChild(0).jjtAccept(this,null);
 	    return null;
 	}
 
 	@Override
 	public Object visit(ASTdefines node, Object data){
-	    System.out.println("visited ASTdefines");
+	    //System.out.println("visited ASTdefines");
 	    return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTdef_fun node, Object data){
-	    System.out.println("visited ASTdef_fun");
+	    //System.out.println("visited ASTdef_fun");
 	    String type = node.jjtGetChild(0).jjtAccept(this,null).toString();
 	    String name = node.jjtGetChild(1).jjtAccept(this,null).toString();
 	    IRG.IRdef_fun(type,name);
@@ -37,13 +37,13 @@ public class ParserVisitorImplements implements ParserVisitor {
     
 	@Override
 	public Object visit(ASTparams node, Object data){
-	    System.out.println("visited ASTparams");
+	    //System.out.println("visited ASTparams");
 	    return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTblock node, Object data){
-	    System.out.println("visited ASTblock");
+	    //System.out.println("visited ASTblock");
 	    int size = node.jjtGetNumChildren();
 	    for(int i=0;i<size;i++){
 		node.jjtGetChild(i).jjtAccept(this,null);
@@ -53,13 +53,13 @@ public class ParserVisitorImplements implements ParserVisitor {
 
         @Override
 	public Object visit(ASTdef_var_list node, Object data){
-	    System.out.println("visited ASTdef_var_list");
+	    //System.out.println("visited ASTdef_var_list");
 	    return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTdef_vars node, Object data){
-	    System.out.println("visited ASTdef_vars");
+	    //System.out.println("visited ASTdef_vars");
 	    int size = node.jjtGetNumChildren();
 	    List<String> var_name = new ArrayList<>();
 	    List<String> var_value = new ArrayList<>();
@@ -73,7 +73,8 @@ public class ParserVisitorImplements implements ParserVisitor {
 		    }else var_value.add("null");
 		}   
 	    }
-	    for(int i=0;i<=var_value.size()-1;i++) IRG.IRdef_vars(type,var_name.get(i),var_value.get(i));
+	    for(int i=0;i<=var_value.size()-1;i++)
+		IRG.IRdef_vars(type,var_name.get(i),var_value.get(i));
 	    return type;
 	}
 
@@ -90,37 +91,37 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	@Override
 	public Object visit(ASTdef_const node, Object data){
-	    System.out.println("visited ASTdef_const");
+	    //System.out.println("visited ASTdef_const");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTtype node, Object data){
-	    System.out.println("visited ASTtype");
+	    //System.out.println("visited ASTtype");
 	    return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTtype_ref node, Object data){
-	    System.out.println("visited ASTtype_ref");
+	    //System.out.println("visited ASTtype_ref");
 	    return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTtype_basic node, Object data){
-	    System.out.println("visited ASTtype_basic");
+	    //System.out.println("visited ASTtype_basic");
 	    return node.jjtGetValue();
 	}
 
 	@Override
 	public Object visit(ASTname node, Object data){
-	    System.out.println("visited ASTname");
+	    //System.out.println("visited ASTname");
 	    return node.jjtGetValue();
 	}
 
 	@Override
 	public Object visit(ASTstmts node, Object data){
-	       System.out.println("visited ASTstmts");
+	    //System.out.println("visited ASTstmts");
 	       int size = node.jjtGetNumChildren();
 	       for(int i=0;i<size;i++){
 		   node.jjtGetChild(i).jjtAccept(this,null);
@@ -130,13 +131,13 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	@Override
 	public Object visit(ASTstmt node, Object data){
-	       System.out.println("visited ASTstmt");
+	    //System.out.println("visited ASTstmt");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
     @Override
     public Object visit(ASTif_stmt node, Object data){
-	System.out.println("visited ASTif_stmt");
+	//System.out.println("visited ASTif_stmt");
 	boolean else_def = false;
 	if(node.jjtGetNumChildren() == 3) else_def = true;
 	
@@ -167,7 +168,7 @@ public class ParserVisitorImplements implements ParserVisitor {
 
     @Override
     public Object visit(ASTfor_stmt node, Object data){
-	System.out.println("visited ASTfor_stmt");
+	//System.out.println("visited ASTfor_stmt");
 	node.jjtGetChild(0).jjtAccept(this,null);
 	labels.add(".L"+label_count);
 	String label1 = labels.get(labels.size()-1);
@@ -195,7 +196,7 @@ public class ParserVisitorImplements implements ParserVisitor {
 
     @Override
     public Object visit(ASTprintf_stmt node, Object data){
-	System.out.println("visited ASTprintf_stmt");
+	//System.out.println("visited ASTprintf_stmt");
 	String str = node.jjtGetValue().toString();
 	int size = node.jjtGetNumChildren();
 	int i;
@@ -212,7 +213,7 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	@Override
 	public Object visit(ASTreturn_stmt node, Object data){
-	    System.out.println("visited ASTreturn_stmt");
+	    //System.out.println("visited ASTreturn_stmt");
 	    String name = node.jjtGetChild(0).jjtAccept(this,null).toString();
 	    IRG.IRreturn_stmt(name);
 	    return name;
@@ -220,8 +221,8 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	@Override
 	public Object visit(ASTexpr node, Object data){
-	    System.out.println("visited ASTexpr");
-	    System.out.println("expr_Children = " + node.jjtGetNumChildren());
+	    //System.out.println("visited ASTexpr");
+	    //System.out.println("expr_Children = " + node.jjtGetNumChildren());
 	    String term = node.jjtGetChild(0).jjtAccept(this,null).toString();
 	    if(node.jjtGetValue().toString() == "="){
 		IRG.IRexpr(term,node.jjtGetChild(1).jjtAccept(this,null).toString());
@@ -232,25 +233,25 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	@Override
 	public Object visit(ASTexpr10 node, Object data){
-	     System.out.println("visited ASTexpr10");
+	    //System.out.println("visited ASTexpr10");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTexpr9 node, Object data){
-	     System.out.println("visited ASTexpr9");
+	    //System.out.println("visited ASTexpr9");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTexpr8 node, Object data){
-	     System.out.println("visited ASTexpr8");
+	    //System.out.println("visited ASTexpr8");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTexpr7 node, Object data){
-	     System.out.println("visited ASTexpr7");
+	    //System.out.println("visited ASTexpr7");
 	     
        	      List<String> ops = (List<String>)node.jjtGetValue();
 	      String op;
@@ -260,7 +261,7 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	      if(node.jjtGetNumChildren()>=2){
 		  for(int i=1;i<=node.jjtGetNumChildren()-1;i++){
-		      System.out.println("expr6:i="+i);
+		      //System.out.println("expr7:i="+i);
 		      op = ops.get(i-1);
 		      rhs = node.jjtGetChild(i).jjtAccept(this,null).toString();
 		      var_temp.add("wk" + var_temp.size());
@@ -274,32 +275,32 @@ public class ParserVisitorImplements implements ParserVisitor {
 
     @Override
 	public Object visit(ASTexpr6 node, Object data){
-	     System.out.println("visited ASTexpr6");
+	//System.out.println("visited ASTexpr6");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 
 	@Override
 	public Object visit(ASTexpr5 node, Object data){
-	     System.out.println("visited ASTexpr5");
+	    //System.out.println("visited ASTexpr5");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTexpr4 node, Object data){
-	     System.out.println("visited ASTexpr4");
+	    //System.out.println("visited ASTexpr4");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTexpr3 node, Object data){
-	     System.out.println("visited ASTexpr3");
+	    //System.out.println("visited ASTexpr3");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
         @Override
        public Object visit(ASTexpr2 node, Object data){
-	      System.out.println("visited ASTexpr2");
+	    //System.out.println("visited ASTexpr2");
        	      List<String> ops = (List<String>)node.jjtGetValue();
 	      String op;
 	      String lhs = node.jjtGetChild(0).jjtAccept(this,null).toString();
@@ -308,7 +309,7 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	      if(node.jjtGetNumChildren()>=2){
 		  for(int i=1;i<=node.jjtGetNumChildren()-1;i++){
-		      System.out.println("expr2:i="+i);
+		      //System.out.println("expr2:i="+i);
 		      op = ops.get(i-1);
 		      rhs = node.jjtGetChild(i).jjtAccept(this,null).toString();
 		      var_temp.add("wk" + var_temp.size());
@@ -322,7 +323,7 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	@Override
 	public Object visit(ASTexpr1 node, Object data){
-	      System.out.println("visited ASTexpr1");
+	    //System.out.println("visited ASTexpr1");
 	      List<String> ops = (List<String>)node.jjtGetValue();
 	      String op;
 	      String lhs = node.jjtGetChild(0).jjtAccept(this,null).toString();
@@ -331,7 +332,7 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	      if(node.jjtGetNumChildren()>=2){
 		  for(int i=1;i<=node.jjtGetNumChildren()-1;i++){
-		      System.out.println("expr1:i="+i);
+		      //System.out.println("expr1:i="+i);
 		      op = ops.get(i-1);
 		      rhs = node.jjtGetChild(i).jjtAccept(this,null).toString();
 		      var_temp.add("wk" + var_temp.size());
@@ -345,7 +346,7 @@ public class ParserVisitorImplements implements ParserVisitor {
 
         @Override
 	public Object visit(ASTterm node, Object data){
-	     System.out.println("visited ASTterm");
+	    //System.out.println("visited ASTterm");
 	    String type;
 	    if((int)node.jjtGetNumChildren() == 2){
 		type = node.jjtGetChild(0).jjtAccept(this,null).toString();
@@ -357,20 +358,20 @@ public class ParserVisitorImplements implements ParserVisitor {
 
 	@Override
 	public Object visit(ASTunary node, Object data){
-	     System.out.println("visited ASTunary");
+	    //System.out.println("visited ASTunary");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTpostfix node, Object data){
-	     System.out.println("visited ASTpostfix");
+	    //System.out.println("visited ASTpostfix");
 	       return node.jjtGetChild(0).jjtAccept(this,null);
 	}
 
 	@Override
 	public Object visit(ASTprimary node, Object data){
-	     System.out.println("visited ASTprimary");
-	     System.out.println("ASTprimary " + node.jjtGetValue().toString());
+	    //System.out.println("visited ASTprimary");
+	    //System.out.println("ASTprimary " + node.jjtGetValue().toString());
 	       return node.jjtGetValue();
 	}
 

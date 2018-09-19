@@ -1,0 +1,18 @@
+#!/bin/sh
+
+parser="java -cp .:generated Parser "
+if [ $# -eq 2 ]
+then 
+	file=$1
+	option=$2
+	blank=" "
+	command=${parser}${option}${blank}${file}
+	eval $command
+elif [ $# -eq 1 ]
+then
+	file=$1
+	command=${parser}${file}
+	eval $command
+else
+	echo "Command Error"
+fi
