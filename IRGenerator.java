@@ -29,7 +29,7 @@ public class IRGenerator {
 	    var_address.add(-flame_size);
 	    break;
 	case "double": var_list.add(name); flame_size += 8; break;
-	default : System.out.println("Error");
+	default : System.out.println("Error in IRdef_vars.");
 	}
 	if(!(value.equals("null"))) IR.add("=,"+value+",null,"+name);
     }
@@ -104,7 +104,7 @@ public class IRGenerator {
     
     static int getAddress(String str){
 	int index = var_list.indexOf(str);
-	System.out.println(str+":"+index);
+	//System.out.println(str+":"+index);
 	if(index == -1) return -1;
 	else return var_address.get(index);
     }

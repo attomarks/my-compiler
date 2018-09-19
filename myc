@@ -1,6 +1,6 @@
 #!/bin/sh
 
-parser="java -cp .:generated Parser "
+parser="java -cp /home/attomarks/github/my-compiler:/home/attomarks/github/my-compiler/generated Parser "
 if [ $# -eq 2 ]
 then 
 	file=$1

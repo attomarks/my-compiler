@@ -55,7 +55,7 @@ class Parser {
 
 		//IRGenerator.IRGenerate();
 		
-		//AssemblyGenerator.Generate();
+		AssemblyGenerator.Generate();
 
 		Runtime r = Runtime.getRuntime();
 		Process p = r.exec("as Assembly.s -o Object.o");
