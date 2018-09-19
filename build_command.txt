@@ -1,0 +1,4 @@
+jjtree -OUTPUT\_DIRECTORY:generated parser.jjt
+javacc -OUTPUT_DIRECTORY:generated generated/IntVParser.jj
+javac -classpath .:generated *.java
+
