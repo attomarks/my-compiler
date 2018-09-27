@@ -3,7 +3,6 @@ import java.io.*;
 
 public class AssemblyGenerator {
     static void Generate(){
-	System.out.println("Generating assembly code...");
 	AssemblyCode.fileCreate();
 	AssemblyCode.headTemp1();
 	AssemblyCode.setString();

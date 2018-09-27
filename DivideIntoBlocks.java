@@ -3,7 +3,8 @@ import java.io.*;
 
 class DivideIntoBlocks{
     static List<String> blocks = new ArrayList<>();
-    static int Dividing(FileReader source){
+
+    static int Dividing(FileReader source) throws DivideException{
 	List<Boolean> usedBlockNum = new ArrayList<>();
 
 	try{
@@ -11,12 +12,14 @@ class DivideIntoBlocks{
 	    int index;
 	    String str;
 	    String temp;
-
+	    
 	    ch = source.read();
 	    blocks.add(String.valueOf((char)ch));
 	    usedBlockNum.add(false);
+	    
 	    while((ch = source.read()) != -1){
 		str = String.valueOf((char)ch);
+		
 		if(str.equals("{")){
 		    index = usedBlockNum.lastIndexOf(false);
 		    //System.out.println("1st{"+index);
@@ -41,17 +44,22 @@ class DivideIntoBlocks{
 		    blocks.set(index,temp+str);
 		}
 	    }
-	}catch (Exception e){
+	    usedBlockNum.set(0,true);
+	}catch(IOException e){
 	    e.printStackTrace();
+	}
+	int unclosedBlock = usedBlockNum.lastIndexOf(false);
+	if(unclosedBlock != -1){
+	    throw new DivideException(unclosedBlock);
 	}
 	return blocks.size();
     }
     
     static void Generate(){
-	int size = blocks.size();
+	int size = blocks.size() - 1;
 	System.out.println("size="+size);
-	for(int i=0;i<size;i++){
-	    System.out.println("block"+(i+1));
+	for(int i=1;i<size+1;i++){
+	    System.out.println("block"+i);
 	    System.out.println(blocks.get(i));
 	    System.out.println("");
 	}

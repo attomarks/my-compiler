@@ -11,72 +11,61 @@ import java.util.*;
 import java.io.*;
 
 class Parser {
-  public static void main(String args[])
-  {
+    
+    static void advancedParsing(FileReader source){
+	System.out.println("Checking syntax in the advanced method...");
 	int blockNum = 0;
 	try{
-		FileReader source;
-	
-    //System.out.println("Reading from standard input...");
-    Parser t;
-
-	if(args.length == 2){
-		switch(args[1]){
-		case "-A":
-		     System.out.println("Checking syntax in the advanced method...");
-		     source = new FileReader(new File(args[0]));
-		     int numOfBlocks = DivideIntoBlocks.Dividing(source);
-		     //DivideIntoBlocks.Generate();
-		     for(blockNum = 1; blockNum < numOfBlocks; blockNum++){
-		        System.out.println("Checking block" + blockNum + "...");
-			t = new Parser(DivideIntoBlocks.blockRef(blockNum));
-			t.block();
-		     }
-		     System.out.println("Processed successfully.");
-		     break;
-		case "-D":
-		     System.out.println("AST dump start...");
-		     source = new FileReader(new File(args[0]));
-		     t = new Parser(source);
-      		     SimpleNode n = t.body();
-      		     n.dump(" ");
-		     System.exit(0);
-		default:
-		     System.out.println("Error : No such option \"" + args[1] + "\"");
-		     System.exit(0);
-		}
+	    int numOfBlocks = DivideIntoBlocks.Dividing(source);
+	    DivideIntoBlocks.Generate();
+	    for(blockNum = 1; blockNum < numOfBlocks; blockNum++){
+		System.out.println("Checking block" + blockNum + "...");
+		Parser part = new Parser(DivideIntoBlocks.blockRef(blockNum));
+		part.block();
+	    }
+	}catch(Exception e){
+	    e.printStackTrace();
+	    System.exit(1);
 	}
-
-	System.out.println("Parsing in the general method...");
-	source = new FileReader(new File(args[0]));
-	t = new Parser(source);
-      ParserVisitor visitor = new ParserVisitorImplements();
-      t.body().jjtAccept(visitor,null);
-
-		//IRGenerator.IRGenerate();
-		
-		AssemblyGenerator.Generate();
-
-		Runtime r = Runtime.getRuntime();
-		Process p = r.exec("as Assembly.s -o Object.o");
-		p.waitFor();
-		p = r.exec("gcc Object.o -o a.out");
-		p.waitFor();
-		
-    }catch (ParseException e){
-      System.out.println("Oops.");
-      e.printStackTrace();
-      if(blockNum>0){
-         System.out.println("### Syntax error in block" + blockNum + " ###");
-	 DivideIntoBlocks.Generate(blockNum);
-	 System.out.println("#############################");
-      }
-    }catch (Exception e) {
-      System.out.println("Oops.");
-      e.printStackTrace();
-      //System.out.println(e.getMessage());
+	System.out.println("Processed successfully.\n");
     }
-  }
+
+    static void ASTdebug(FileReader source){
+	System.out.println("AST dump start...");
+	try{
+	    Parser AST = new Parser(source);
+	    SimpleNode n = AST.body();
+	    n.dump(" ");
+	}catch(Exception e){
+	    e.printStackTrace();
+	}
+	System.exit(0);
+    }
+
+    static void IRdebug(FileReader source){
+	System.out.println("IR dump start...");
+	try{
+	    Parser IR = new Parser(source);
+	    ParserVisitor visitor = new ParserVisitorImplements();
+	    IR.body().jjtAccept(visitor,null);
+	    IRGenerator.IRGenerate();
+	}catch(Exception e){
+	    e.printStackTrace();
+	}
+	System.exit(0);
+    }
+
+    static void generalParsing(FileReader source){
+	System.out.println("Parsing in the general method...");
+	try{
+	    Parser parser = new Parser(source);
+	    ParserVisitor visitor = new ParserVisitorImplements();
+	    parser.body().jjtAccept(visitor,null);
+	}catch(Exception e){
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+    }		
 }
 
 PARSER_END(Parser)
