@@ -1,10 +1,10 @@
 #!/bin/sh
 
-parser="java -cp /home/attomarks/github/my-compiler:/home/attomarks/github/my-compiler/generated Parser "
+parser="java -cp /home/attomarks/github/my-compiler:/home/attomarks/github/my-compiler/generated Compiler "
 if [ $# -eq 2 ]
 then 
-	file=$1
-	option=$2
+	file=$2
+	option=$1
 	blank=" "
 	command=${parser}${option}${blank}${file}
 	eval $command
