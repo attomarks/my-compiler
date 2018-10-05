@@ -74,21 +74,37 @@ public class AssemblyCode {
 	moveax(arg1);
 	movecx(arg2);
 	pw.println("    addl    %ecx, %eax");
-	movres(res);
+	moveaxres(res);
     }
 
     static void sub(String arg1, String arg2, String res){
 	moveax(arg1);
 	movecx(arg2);
 	pw.println("    subl    %ecx, %eax");
-	movres(res);
+	moveaxres(res);
     }
 
     static void mul(String arg1, String arg2, String res){
 	moveax(arg1);
 	movecx(arg2);
 	pw.println("    imull    %ecx, %eax");
-	movres(res);
+	moveaxres(res);
+    }
+
+    static void div(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
+	pw.println("    cltd");
+	pw.println("    idivl   %ecx");
+	moveaxres(res);
+    }
+
+    static void mod(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
+	pw.println("    cltd");
+	pw.println("    idivl   %ecx");
+	movedxres(res);
     }
 
     static void eq(String arg1, String arg2, String res){
@@ -155,9 +171,14 @@ public class AssemblyCode {
 	    pw.println("    movl    "+address+"(%rbp), %ecx");
     }
 
-    static void movres(String res){
+    static void moveaxres(String res){
 	int address = IRGenerator.getAddress(res);
 	pw.println("    movl    %eax, "+address+"(%rbp)");
+    }
+
+    static void movedxres(String res){
+	int address = IRGenerator.getAddress(res);
+	pw.println("    movl    %edx, "+address+"(%rbp)");
     }
 
     static void test(){

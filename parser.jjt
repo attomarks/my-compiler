@@ -318,7 +318,7 @@ void expr1() #expr1(>1):
 	term()
 	("*" term() {tokens.add("*");}
 	|"/" term() {tokens.add("/");}
-	//|"%" term()
+	|"%" term() {tokens.add("%");}
 	)* {jjtThis.jjtSetValue(tokens);}
 }
 

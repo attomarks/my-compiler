@@ -25,9 +25,12 @@ public class AssemblyGenerator {
 	    case "*":
 		AssemblyCode.mul(IR[1],IR[2],IR[3]);
 		break;
-	    /*case "/":
+	    case "/":
 		AssemblyCode.div(IR[1],IR[2],IR[3]);
-		break;*/
+		break;
+	    case "%":
+		AssemblyCode.mod(IR[1],IR[2],IR[3]);
+		break;
 	    case "==":
 		AssemblyCode.eq(IR[1],IR[2],IR[3]);
 		break;
