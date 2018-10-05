@@ -45,7 +45,7 @@ class DivideIntoBlocks{
 		}
 	    }
 	    usedBlockNum.set(0,true);
-	}catch(IOException e){
+	}catch(Exception e){
 	    e.printStackTrace();
 	}
 	int unclosedBlock = usedBlockNum.lastIndexOf(false);

@@ -59,293 +59,108 @@ public class AssemblyCode {
 	pw.println(label+":");
     }
     
-    static void eqRhsIsNum(int address, int value){
-	pw.println("    movl    $"+value+", "+address+"(%rbp)");
-    }
-    
-    static void eqRhsIsLit(int lAddress, int rAddress){
-	pw.println("    movl    "+rAddress+"(%rbp), %eax");
-	pw.println("    movl    %eax, "+lAddress+"(%rbp)");
-    }
-    
-    static void mulAllNum(int llValue, int rlValue, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    imull   $"+rlValue+", %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
-    }
-    
-    static void mulLlhsIsNum(int llValue, int rlAddress, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    imull   %ecx, %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
-    }
-    
-    static void mulRlhsIsNum(int llAddress, int rlValue, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    imull   $"+rlValue+", %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
+    static void assign(String lhs, String rhs){
+	int lhsAddress = IRGenerator.getAddress(lhs);
+	int rhsAddress = IRGenerator.getAddress(rhs);
+	if(rhsAddress == -1)
+	    pw.println("    movl    $"+rhs+", "+lhsAddress+"(%rbp)");
+	else{
+	    pw.println("    movl    "+rhsAddress+"(%rbp), %eax");
+	    pw.println("    movl    %eax, "+lhsAddress+"(%rbp)");
+	}
     }
 
-    static void mulAllLit(int llAddress, int rlAddress, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    imull   %ecx, %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
-    }
-    
-    static void addAllNum(int llValue, int rlValue, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    addl    $"+rlValue+", %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
-    }
-    
-    static void addLlhsIsNum(int llValue, int rlAddress, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
+    static void add(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
 	pw.println("    addl    %ecx, %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
-    }
-    
-    static void addRlhsIsNum(int llAddress, int rlValue, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    addl    $"+rlValue+", %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
-    }
-    
-    static void addAllLit(int llAddress, int rlAddress, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    addl    %ecx, %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
+	movres(res);
     }
 
-    static void subAllNum(int llValue, int rlValue, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    subl    $"+rlValue+", %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
-    }
-
-    static void subLlhsIsNum(int llValue, int rlAddress, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
+    static void sub(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
 	pw.println("    subl    %ecx, %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
+	movres(res);
     }
 
-    static void subRlhsIsNum(int llAddress, int rlValue, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    subl    $"+rlValue+", %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
+    static void mul(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
+	pw.println("    imull    %ecx, %eax");
+	movres(res);
     }
 
-    static void subAllLit(int llAddress, int rlAddress, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    subl    %ecx, %eax");
-	pw.println("    movl    %eax, "+rAddress+"(%rbp)");
-    }
-
-    static void gtAllNum(int llValue, int rlValue, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setg    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void gtLlhsIsNum(int llValue, int rlAddress, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setg    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void gtRlhsIsNum(int llAddress, int rlValue, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setg    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-
-    static void gtAllLit(int llAddress, int rlAddress, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setg    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-
-    static void ltAllNum(int llValue, int rlValue, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setl    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void ltLlhsIsNum(int llValue, int rlAddress, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setl    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void ltRlhsIsNum(int llAddress, int rlValue, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setl    %al");
-	pw.println("    movzbl  %al, %eax");
-        pw.println("    testl    %eax, %eax");
-    }
-
-    static void ltAllLit(int llAddress, int rlAddress, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setl    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-
-    static void geAllNum(int llValue, int rlValue, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setge   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void geLlhsIsNum(int llValue, int rlAddress, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setge   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void geRlhsIsNum(int llAddress, int rlValue, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setge   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-
-    static void geAllLit(int llAddress, int rlAddress, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setge   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-
-    static void leAllNum(int llValue, int rlValue, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setle   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void leLlhsIsNum(int llValue, int rlAddress, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setle   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void leRlhsIsNum(int llAddress, int rlValue, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setle   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-
-    static void leAllLit(int llAddress, int rlAddress, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
-	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setle   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-
-    static void eqAllNum(int llValue, int rlValue, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    sete    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void eqLlhsIsNum(int llValue, int rlAddress, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
+    static void eq(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
 	pw.println("    cmpl    %ecx, %eax");
 	pw.println("    sete    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void eqRlhsIsNum(int llAddress, int rlValue, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    sete    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
+	test();
     }
 
-    static void eqAllLit(int llAddress, int rlAddress, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
+    static void ne(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
 	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    sete    %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
+	pw.println("    setne    %al");
+	test();
     }
 
-    static void neAllNum(int llValue, int rlValue, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setne   %al");
-	pw.println("    movzbl  %al, %eax");
-        pw.println("    testl    %eax, %eax");
-    }
-    
-    static void neLlhsIsNum(int llValue, int rlAddress, int rAddress){
-	pw.println("    movl    $"+llValue+", %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
+    static void gt(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
 	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setne   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
-    }
-    
-    static void neRlhsIsNum(int llAddress, int rlValue, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    cmpl    $"+rlValue+", %eax");
-	pw.println("    setne   %al");
-	pw.println("    movzbl  %al, %eax");
-	pw.println("    testl    %eax, %eax");
+	pw.println("    setg    %al");
+	test();
     }
 
-    static void neAllLit(int llAddress, int rlAddress, int rAddress){
-	pw.println("    movl    "+llAddress+"(%rbp), %eax");
-	pw.println("    movl    "+rlAddress+"(%rbp), %ecx");
+    static void lt(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
 	pw.println("    cmpl    %ecx, %eax");
-	pw.println("    setne   %al");
+	pw.println("    setl    %al");
+	test();
+    }
+
+    static void ge(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
+	pw.println("    cmpl    %ecx, %eax");
+	pw.println("    setge    %al");
+	test();
+    }
+
+    static void le(String arg1, String arg2, String res){
+	moveax(arg1);
+	movecx(arg2);
+	pw.println("    cmpl    %ecx, %eax");
+	pw.println("    setle    %al");
+	test();
+    }
+
+    static void moveax(String arg){
+	int address = IRGenerator.getAddress(arg);
+	if(address == -1)
+	    pw.println("    movl    $"+arg+", %eax");
+	else
+	    pw.println("    movl    "+address+"(%rbp), %eax");
+    }
+
+    static void movecx(String arg){
+	int address = IRGenerator.getAddress(arg);
+	if(address == -1)
+	    pw.println("    movl    $"+arg+", %ecx");
+	else
+	    pw.println("    movl    "+address+"(%rbp), %ecx");
+    }
+
+    static void movres(String res){
+	int address = IRGenerator.getAddress(res);
+	pw.println("    movl    %eax, "+address+"(%rbp)");
+    }
+
+    static void test(){
 	pw.println("    movzbl  %al, %eax");
 	pw.println("    testl    %eax, %eax");
     }
@@ -381,4 +196,6 @@ public class AssemblyCode {
 	}
 	return Register;
     }
+
+    
 }

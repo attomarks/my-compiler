@@ -20,13 +20,13 @@ class Compiler{
 		break;
 	    default:
 		System.out.println("Error : No such option \"" + option + "\".");
-		System.exit(0);
+		System.exit(1);
 	    }
 	}else if(args.length == 1){
 	    sourceName = args[0];
 	}else{
 	    System.out.println("Error : Invalid number of arguments.");
-	    System.exit(0);
+	    System.exit(1);
 	}
 	
 	try{

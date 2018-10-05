@@ -17,12 +17,16 @@ class Parser {
 	int blockNum = 0;
 	try{
 	    int numOfBlocks = DivideIntoBlocks.Dividing(source);
-	    DivideIntoBlocks.Generate();
+	    //DivideIntoBlocks.Generate();
 	    for(blockNum = 1; blockNum < numOfBlocks; blockNum++){
 		System.out.println("Checking block" + blockNum + "...");
 		Parser part = new Parser(DivideIntoBlocks.blockRef(blockNum));
 		part.block();
 	    }
+	}catch(ParseException e){
+	    e.printStackTrace();
+	    DivideIntoBlocks.Generate(blockNum);
+		System.exit(1);
 	}catch(Exception e){
 	    e.printStackTrace();
 	    System.exit(1);
