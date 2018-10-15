@@ -22,7 +22,9 @@ public class ParserVisitorImplements implements ParserVisitor {
 	@Override
 	public Object visit(ASTdefines node, Object data){
 	    //System.out.println("visited ASTdefines");
-	    return node.jjtGetChild(0).jjtAccept(this,null);
+	    for(int i=0; i<node.jjtGetNumChildren(); i++)
+		node.jjtGetChild(i).jjtAccept(this,null);
+	    return node.jjtGetNumChildren();
 	}
 
 	@Override
@@ -31,6 +33,7 @@ public class ParserVisitorImplements implements ParserVisitor {
 	    String type = node.jjtGetChild(0).jjtAccept(this,null).toString();
 	    String name = node.jjtGetChild(1).jjtAccept(this,null).toString();
 	    IRG.IRdef_fun(type,name);
+	    node.jjtGetChild(2).jjtAccept(this,null);
 	    node.jjtGetChild(3).jjtAccept(this,null);
 	    return name;
 	}
@@ -38,7 +41,27 @@ public class ParserVisitorImplements implements ParserVisitor {
 	@Override
 	public Object visit(ASTparams node, Object data){
 	    //System.out.println("visited ASTparams");
-	    return node.jjtGetChild(0).jjtAccept(this,null);
+	    if(node.jjtGetNumChildren() == 0)
+		return "void";
+	    else
+		return node.jjtGetChild(0).jjtAccept(this,null);
+	}
+
+    @Override
+	public Object visit(ASTfixedparams node, Object data){
+	    //System.out.println("visited ASTfixedparams");
+	for(int i=0; i<node.jjtGetNumChildren(); i++)
+	    node.jjtGetChild(i).jjtAccept(this,null);
+	return node.jjtGetNumChildren();
+	}
+
+    @Override
+	public Object visit(ASTparam node, Object data){
+	    //System.out.println("visited ASTparam");
+	    String type = node.jjtGetChild(0).jjtAccept(this,null).toString();
+	    String name = node.jjtGetChild(1).jjtAccept(this,null).toString();
+	    IRG.IRparam(type,name);
+	    return null;
 	}
 
 	@Override
@@ -67,14 +90,17 @@ public class ParserVisitorImplements implements ParserVisitor {
 	    for(int i=1;i<size;i++){
 		if(node.jjtGetChild(i).toString().equals("name")){
 		    var_name.add(node.jjtGetChild(i).jjtAccept(this,null).toString());
+		    IRG.IRdef_var(type,var_name.get(var_name.size()-1));
 		    if(i != size-1 && node.jjtGetChild(i+1).toString().equals("expr")){
 			var_value.add(node.jjtGetChild(i+1).jjtAccept(this,null).toString());
 			i++;
 		    }else var_value.add("null");
-		}   
+		}
+		if(var_name.size() == var_value.size())
+		    IRG.IRvar_ini(type,var_name.get(var_name.size()-1),var_value.get(var_value.size()-1));
 	    }
-	    for(int i=0;i<=var_value.size()-1;i++)
-		IRG.IRdef_vars(type,var_name.get(i),var_value.get(i));
+	    /*for(int i=0;i<=var_value.size()-1;i++)
+		IRG.IRdef_vars(type,var_name.get(i),var_value.get(i));*/
 	    return type;
 	}
 
@@ -365,7 +391,25 @@ public class ParserVisitorImplements implements ParserVisitor {
 	@Override
 	public Object visit(ASTpostfix node, Object data){
 	    //System.out.println("visited ASTpostfix");
-	       return node.jjtGetChild(0).jjtAccept(this,null);
+	    int size = node.jjtGetNumChildren();
+	    if(size == 2){
+		String name = node.jjtGetChild(0).jjtAccept(this,null).toString();
+		node.jjtGetChild(1).jjtAccept(this,null);
+		return name;
+	    }else
+		return node.jjtGetChild(0).jjtAccept(this,null);
+	}
+
+    	@Override
+	public Object visit(ASTargs node, Object data){
+	    //System.out.println("visited ASTargs");
+	    int size = node.jjtGetNumChildren();
+	    //for(int i=size-1; i>=0; i--){
+	    for(int i=0; i<size; i++){
+		String name = node.jjtGetChild(i).jjtAccept(this,null).toString();
+		IRG.IRarg(name);
+	    }
+	    return null;
 	}
 
 	@Override

@@ -7,12 +7,27 @@ public class AssemblyGenerator {
 	AssemblyCode.headTemp1();
 	AssemblyCode.setString();
 	AssemblyCode.headTemp2();
-	IRGenerator.addWkToList();
-	AssemblyCode.expandStack(IRGenerator.getStackSize());
+	//IRGenerator.addWkToList();
+	//AssemblyCode.expandStack(IRGenerator.getStackSize());
 
 	for(int i=0;i<IRGenerator.IRNumOfLines();i++){
+	    int func_num = 0;
 	    String[] IR = IRGenerator.IRRead(i);
 	    switch(IR[0]){
+	    case "func":
+		int flame = IRGenerator.getFlame(func_num);
+		func_num++;
+		AssemblyCode.function(flame,IR[3]);
+		break;
+	    case "param":
+		AssemblyCode.parameter(IR[2],IR[3]);
+		break;
+	    case "arg":
+		AssemblyCode.argument(IR[3]);
+		break;
+	    case "var":
+		AssemblyCode.variable(IR[2],IR[3]);
+		break;
 	    case "=": 
 		AssemblyCode.assign(IR[3],IR[1]);
 		break;
@@ -68,7 +83,9 @@ public class AssemblyGenerator {
 		}else{
 		    AssemblyCode.printf(Integer.parseInt(IR[2]),address);
 		}break;
-
+	    case "rtn":
+		AssemblyCode.ret(IR[3]);
+		break;
 	    }
 	}
 	AssemblyCode.footTemp();

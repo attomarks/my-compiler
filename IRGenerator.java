@@ -4,25 +4,26 @@ import java.io.*;
 public class IRGenerator {
     static List<String> var_list = new ArrayList<>();
     static List<Integer> var_address = new ArrayList<>();
-    static String func_name = null;
+    static String func_type = null;
     static int flame_size = 0;
+    static List<Integer> func_flame = new ArrayList<>();
     static List<String> printStr = new ArrayList<>();
     public static List<String> IR = new ArrayList<>();
     
     public static void IRlabel(String label){
-	IR.add("label,null,null,"+label);
+	IR.add("label,,,"+label);
     }
 
     public static void IRdef_fun(String type, String name){
-	switch(type){
-	case "int": //IR.add("name"); break;
-	case "double": /*IR.add("def_" + name + ": local 8");*/ break;
-	default : System.out.println("Error in IRdef_fun.");
-	}
-	func_name = name;
+	IR.add("func,,"+type+","+name);
+	func_type = type;
+    }
+
+    static void IRdef_var(String type, String name){
+	IR.add("var,,"+type+","+name);
     }
     
-    public static void IRdef_vars(String type, String name, String value){
+    public static void IRvar_ini(String type, String name, String value){
 	switch(type){
 	case "int": var_list.add(name);
 	    flame_size += 4;
@@ -31,12 +32,27 @@ public class IRGenerator {
 	case "double": var_list.add(name); flame_size += 8; break;
 	default : System.out.println("Error in IRdef_vars.");
 	}
-	if(!(value.equals("null"))) IR.add("=,"+value+",null,"+name);
+	if(!(value.equals("null"))) IR.add("=,"+value+",,"+name);
+    }
+
+    static void IRparam(String type, String name){
+	switch(type){
+	case "int": var_list.add(name);
+	    flame_size += 4;
+	    var_address.add(-flame_size);
+	    break;
+	case "double": var_list.add(name); flame_size += 8; break;
+	default : System.out.println("Error in IRparam.");
+	}
+	IR.add("param,,"+type+","+name);
     }
 
     public static void IRreturn_stmt(String value){
-	//IR.add("=,"+value+",null,"+func_name);
-	func_name = null;
+	IR.add("rtn,,,"+value);
+	func_type = null;
+	//System.out.println(flame_size);
+	func_flame.add(flame_size);
+	flame_size = 0;
     }
 
     public static void IRprintf_stmt(String str){
@@ -47,11 +63,11 @@ public class IRGenerator {
 	}else{
 	    strNum = printStr.indexOf(str);
 	}
-	IR.add("printf,null,0,.LC"+strNum);
+	IR.add("printf,,0,.LC"+strNum);
     }
 
     public static void IRprintf_stmt(String var, int varNum){
-	IR.add("printf,null,"+varNum+","+var);
+	IR.add("printf,,"+varNum+","+var);
     }
 	
     public static void IRexpr(String op, String lhs, String rhs, String eq){
@@ -60,25 +76,30 @@ public class IRGenerator {
 
     public static void IRexpr(String temp, String eq){
 	//if(Simple_Assign == true){
-	    IR.add("=,"+eq+",null,"+temp);
+	    IR.add("=,"+eq+",,"+temp);
 	    /*}else{
 	    IR.add(temp+","+eq);
 	    }*/
     }
 
+    static void IRarg(String name){
+	IR.add("arg,,,"+name);
+    }
+
     public static void IRjnz(String label){
-	IR.add("jnz,null,null,"+label);
+	IR.add("jnz,,,"+label);
     }
 
     public static void IRjmp(String label){
-	IR.add("jmp,null,null,"+label);
+	IR.add("jmp,,,"+label);
     }
 
     public static void IRjne(String label){
-	IR.add("jne,null,null,"+label);
+	IR.add("jne,,,"+label);
     }
 
     static void IRGenerate(){
+	//System.out.println(var_list);
 	for(int i=0;i<IR.size();i++){
 	    System.out.println(IR.get(i));
 	}
@@ -119,5 +140,9 @@ public class IRGenerator {
 
     static String getString(int stringNum){
 	return printStr.get(stringNum);
+    }
+
+    static int getFlame(int num){
+	return func_flame.get(num);
     }
 }

@@ -131,7 +131,20 @@ void def_fun():
 void params():
 {}
 {
-	/*LOOKAHEAD(<VOID> ")")*/ <VOID>
+	LOOKAHEAD(<VOID> ")") <VOID>
+	|fixedparams()
+}
+
+void fixedparams():
+{}
+{
+	param() ( LOOKAHEAD(2) "," param())*
+}
+
+void param():
+{}
+{
+	type() name()
 }
 
 void block():
@@ -349,13 +362,18 @@ void postfix():
 {}
 {
 	primary()
-	/*("++"
+	(/*"++"
 	|"--"
 	|"[" expr() "]"
-	)**/
-	//|"." name()
-	//|"->" name()
-	//|"(" args() ")")*
+	|"." name()
+	|"->" name()
+	|*/"(" args() ")")*
+}
+
+void args():
+{}
+{
+    [ expr() ("," expr())* ]
 }
 
 void primary():
