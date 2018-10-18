@@ -4,7 +4,7 @@ class Compiler{
     public static void main(String args[]){
 
 	String sourceName = null, option = null;
-	boolean advance = false, ASTdebug = false, IRdebug = false;
+	boolean advance = false, ASTdebug = false, IRdebug = false, BlockDebug = false;
 	if(args.length == 2){
 	    sourceName = args[1];
 	    option = args[0];
@@ -12,11 +12,14 @@ class Compiler{
 	    case "-A":
 		advance = true;
 		break;
-	    case "-AD":
+	    case "-AST":
 		ASTdebug = true;
 		break;
-	    case "-ID":
+	    case "-IR":
 		IRdebug = true;
+		break;
+	    case "-BLK":
+		BlockDebug = true;
 		break;
 	    default:
 		System.out.println("Error : No such option \"" + option + "\".");
@@ -32,9 +35,9 @@ class Compiler{
 	try{
 	    FileReader source;
 
-	    if(advance == true){
+	    if(advance == true || BlockDebug == true){
 		source = new FileReader(new File(sourceName));
-		Parser.advancedParsing(source);
+		Parser.advancedParsing(source,BlockDebug);
 	    }
 	    if(ASTdebug == true){
 		source = new FileReader(new File(sourceName));

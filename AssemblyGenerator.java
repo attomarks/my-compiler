@@ -10,8 +10,9 @@ public class AssemblyGenerator {
 	//IRGenerator.addWkToList();
 	//AssemblyCode.expandStack(IRGenerator.getStackSize());
 
+	int func_num = 0;
 	for(int i=0;i<IRGenerator.IRNumOfLines();i++){
-	    int func_num = 0;
+	    
 	    String[] IR = IRGenerator.IRRead(i);
 	    switch(IR[0]){
 	    case "func":

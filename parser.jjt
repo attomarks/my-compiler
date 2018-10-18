@@ -12,12 +12,15 @@ import java.io.*;
 
 class Parser {
     
-    static void advancedParsing(FileReader source){
+    static void advancedParsing(FileReader source, boolean BlockDebug){
 	System.out.println("Checking syntax in the advanced method...");
 	int blockNum = 0;
 	try{
 	    int numOfBlocks = DivideIntoBlocks.Dividing(source);
-	    //DivideIntoBlocks.Generate();
+	    if(BlockDebug == true){
+			DivideIntoBlocks.Generate();
+			System.exit(0);
+		}
 	    for(blockNum = 1; blockNum < numOfBlocks; blockNum++){
 		System.out.println("Checking block" + blockNum + "...");
 		Parser part = new Parser(DivideIntoBlocks.blockRef(blockNum));
@@ -74,7 +77,16 @@ class Parser {
 
 PARSER_END(Parser)
 
-SKIP: { <[" ","\t","\r","\n"]> }
+//SKIP: { <[" ","\t","\r","\n"]> }
+SPECIAL_TOKEN: { <SPACES: ([" ", "\t", "\n", "\r", "\f"])+> }
+
+MORE: { <"/*"> : IN_BLOCK_COMMENT }
+<IN_BLOCK_COMMENT> MORE: { <~[]> }
+<IN_BLOCK_COMMENT> SPECIAL_TOKEN: { <BLOCK_COMMENT: "*/"> : DEFAULT }
+
+SPECIAL_TOKEN: {
+    <LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r\n" | "\r")?>
+}
 
 TOKEN:{
 	 <VOID:"void">

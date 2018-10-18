@@ -364,10 +364,12 @@ public class AssemblyCode {
 
     static void ret(String str){
 	int index = varList.indexOf(str);
-	if(index == -1)
-	    pw.println("    movl    $"+str+", %eax");
-	else
+	if(index != -1)
 	    pw.println("    movl    "+varAddress.get(index)+"(%rbp), %eax");
+	else if(lastReg.equals(str))
+		;
+	else
+	    pw.println("    movl    $"+str+", %eax");
 	pw.println("    leave");
 	pw.println("    ret");
 	pw.println("    .size   "+funcNameNow+",.-"+funcNameNow);
